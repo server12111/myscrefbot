@@ -40,23 +40,43 @@ async def create_withdraw_table():
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
                 user_id INTEGER NOT NULL,
                 amount REAL NOT NULL,
+                status TEXT DEFAULT 'pending',
                 created_at INTEGER DEFAULT (strftime('%s', 'now'))
             )
         """)
-
+        try:
+            await db.execute("ALTER TABLE withdraws ADD COLUMN status TEXT DEFAULT 'pending'")
+        except Exception:
+            pass
         await db.commit()
 
 
 async def create_withdraw_request(user_id: int, amount: float):
     async with aiosqlite.connect(DB_NAME) as db:
         cursor = await db.execute("""
-            INSERT INTO withdraws (user_id, amount)
-            VALUES (?, ?)
+            INSERT INTO withdraws (user_id, amount, status)
+            VALUES (?, ?, 'pending')
         """, (user_id, amount))
 
         await db.commit()
 
         return cursor.lastrowid
+
+
+async def get_withdraw_request(request_id: int):
+    async with aiosqlite.connect(DB_NAME) as db:
+        cursor = await db.execute("""
+            SELECT id, user_id, amount, status FROM withdraws WHERE id = ?
+        """, (request_id,))
+        return await cursor.fetchone()
+
+
+async def update_withdraw_status(request_id: int, status: str):
+    async with aiosqlite.connect(DB_NAME) as db:
+        await db.execute("""
+            UPDATE withdraws SET status = ? WHERE id = ?
+        """, (status, request_id))
+        await db.commit()
 
 
 async def add_user(user_id: int, referrer_id: int = None):
