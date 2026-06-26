@@ -1,4 +1,10 @@
 import asyncio
+import os
+import sys
+
+# Always run from the directory where main.py lives
+os.chdir(os.path.dirname(os.path.abspath(__file__)))
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
 from aiogram import Bot, Dispatcher
 
