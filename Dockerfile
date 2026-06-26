@@ -1,12 +1,12 @@
 FROM python:3.11-slim
 
-WORKDIR /app
+WORKDIR /app/gfhjgffg
 
-COPY requirements.txt ./
+COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
-COPY gfhjgffg/ ./gfhjgffg/
+COPY gfhjgffg/ .
 
-RUN mkdir -p gfhjgffg/images
+RUN mkdir -p images
 
-CMD ["python", "gfhjgffg/main.py"]
+CMD ["python", "main.py"]
